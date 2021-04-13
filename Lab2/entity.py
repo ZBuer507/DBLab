@@ -27,37 +27,19 @@ class sequence:
             db.rollback()
 
     def Update(db, cursor, sequence_name):
-        running = True
         road = input("需更改信息的road：")
-        print("请选择需要修改的基本信息：\n"
-            "1.road\n"
-            "2.name\n"
-            "3.退出\n")
-        choose = input()
-        while running:
-            sql = "UPDATE "+ sequence_name +" "
-            if choose == "1":
-                road = input("请输入新的road：")
-                sql = sql + "set road = \'" + road + "\' "
-                break
-            elif choose == "2":
-                name = input("请输入新的name：")
-                sql = sql + "set name = \'" + name + "\' "
-                break
-            elif choose == "3":
-                running = False
-            else:
-                continue
-        if running == True:
-            sql = sql + "WHERE road = \'" + road + "\';"
-            print(sql)
-            try:
-                cursor.execute(sql)
-                db.commit()
-                print(sequence_name + "序列已更新编号为" + road + "的用户信息")
-            except:
-                print("Error in \"" + sql + "\"")
-                db.rollback()
+        sql = "UPDATE "+ sequence_name +" "
+        name = input("请输入新的name：")
+        sql = sql + "set name = \'" + name + "\' "
+        sql = sql + "WHERE road = \'" + road + "\';"
+        print(sql)
+        try:
+            cursor.execute(sql)
+            db.commit()
+            print(sequence_name + "序列已更新road为" + road + "的信息")
+        except:
+            print("Error in \"" + sql + "\"")
+            db.rollback()
 
     def Delete(db, cursor, sequence_name):
         sql = "DELETE FROM "+ sequence_name +" WHERE road = "
@@ -67,7 +49,21 @@ class sequence:
         try:
             cursor.execute(sql)
             db.commit()
-            print(sequence_name + "序列已删除编号为" + road + "的用户信息")
+            print(sequence_name + "序列已删除road为" + road + "的信息")
         except:
             print("Error in \"" + sql + "\"")
             db.rollback()
+    
+    def SelectName(db, cursor, sequence_name):
+        sql = "select name from "+ sequence_name +" where road = "
+        road = input("途径序号：")
+        sql = sql + "\'" + road + "\';"
+        print(sql)
+        try:
+            cursor.execute(sql)
+            print(sequence_name + "中途径序号为" + road + "的名称:")
+            data = cursor.fetchall()
+            print(data[0]["name"])
+        except:
+            print("Error in \"" + sql + "\"")
+            pass
