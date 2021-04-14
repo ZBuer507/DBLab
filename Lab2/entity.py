@@ -25,12 +25,11 @@ class sequence:
         except:
             print("Error in \"" + sql + "\"")
             db.rollback()
-    def Insert(db, cursor, sequence_name, road, name):
+    def InsertSlient(db, cursor, sequence_name, road, name):
         sql = "insert into "+ sequence_name +"(road, name) value(\'" + road + "\', \'" + name + "\');"
         try:
             cursor.execute(sql)
             db.commit()
-            print(sequence_name + "已提交名为" + name + "的信息")
         except:
             print("Error in \"" + sql + "\"")
             db.rollback()
@@ -102,12 +101,11 @@ class godorsource:
         except:
             print("Error in \"" + sql + "\"")
             db.rollback()
-    def Insert(db, cursor, godorsource_name, name):
+    def InsertSlient(db, cursor, godorsource_name, name):
         sql = "insert into "+ godorsource_name +"(name) value(\'" + name + "\');"
         try:
             cursor.execute(sql)
             db.commit()
-            print(godorsource_name + "已提交名为" + name + "的信息")
         except:
             print("Error in \"" + sql + "\"")
             db.rollback()
@@ -143,7 +141,7 @@ class tarot_club:
     def Init(db, cursor, tarot_club_name):
         cursor.execute("drop table if exists " + tarot_club_name)
         sql = """create table """+ tarot_club_name +""" (
-                codename varchar(2),
+                codename varchar(30),
                 name varchar(30),
                 PRIMARY KEY (codename))"""
         cursor.execute(sql)
@@ -163,12 +161,11 @@ class tarot_club:
         except:
             print("Error in \"" + sql + "\"")
             db.rollback()
-    def Insert(db, cursor, tarot_club_name, codename, name):
+    def InsertSlient(db, cursor, tarot_club_name, codename, name):
         sql = "insert into "+ tarot_club_name +"(codename, name) value(\'" + codename + "\', \'" + name + "\');"
         try:
             cursor.execute(sql)
             db.commit()
-            print(tarot_club_name + "已提交名为" + name + "的信息")
         except:
             print("Error in \"" + sql + "\"")
             db.rollback()
