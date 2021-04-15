@@ -3,12 +3,14 @@ import pymysql
 # 序列
 class sequence:
     def Init(db, cursor, sequence_name):
+        cursor.execute("set foreign_key_checks = 0")
         cursor.execute("drop table if exists " + sequence_name)
         sql = """create table """+ sequence_name +""" (
-                road varchar(2),
-                name varchar(30),
-                PRIMARY KEY (road))"""
+                road varchar(2) not null,
+                name varchar(30) not null,
+                primary key (name))"""
         cursor.execute(sql)
+        cursor.execute("set foreign_key_checks = 1")
         db.commit()
         return sequence_name
 
@@ -16,6 +18,16 @@ class sequence:
         sql = "insert into "+ sequence_name +"(road, name) "
         road = input("road:")
         name = input("name:")
+        if road == "" or name == "":
+            print("输入为空")
+            return
+        sql2 = "select count(*) from "+sequence_name+" where road = \'" + road + "\'"
+        cursor.execute(sql2)
+        flag = cursor.fetchall()
+        if flag[0]["count(*)"] > 0:
+            print(road + "重复")
+            return
+        
         sql = sql + "value(\'" + road + "\', \'" + name + "\');"
         print(sql)
         try:
@@ -35,11 +47,20 @@ class sequence:
             db.rollback()
 
     def Update(db, cursor, sequence_name):
-        road = input("需更改信息的road：")
-        sql = "UPDATE "+ sequence_name +" "
-        name = input("请输入新的name：")
-        sql = sql + "set name = \'" + name + "\' "
-        sql = sql + "WHERE road = \'" + road + "\';"
+        name = input("需更改信息的name：")
+        sql = "update "+ sequence_name +" "
+        road = input("请输入新的road：")
+        if road == "":
+            print("输入为空")
+            return
+        sql2 = "select count(*) from "+sequence_name+" where name = \'" + name + "\'"
+        cursor.execute(sql2)
+        flag = cursor.fetchall()
+        if flag[0]["count(*)"] == 0:
+            print(name + "不存在")
+            return
+        sql = sql + "set road = \'" + road + "\' "
+        sql = sql + "where name = \'" + name + "\';"
         print(sql)
         try:
             cursor.execute(sql)
@@ -50,48 +71,66 @@ class sequence:
             db.rollback()
 
     def Delete(db, cursor, sequence_name):
-        sql = "DELETE FROM "+ sequence_name +" WHERE road = "
-        road = input("要删除的road：")
-        sql = sql + "\'" + road + "\';"
+        sql = "delete from "+ sequence_name +" where name = "
+        name = input("要删除的name：")
+        if name == "":
+            print("输入为空")
+            return
+        sql2 = "select count(*) from "+sequence_name+" where name = \'" + name + "\'"
+        cursor.execute(sql2)
+        flag = cursor.fetchall()
+        if flag[0]["count(*)"] == 0:
+            print(name + "不存在")
+            return
+        sql = sql + "\'" + name + "\';"
         print(sql)
         try:
             cursor.execute(sql)
             db.commit()
-            print(sequence_name + "已删除road为" + road + "的信息")
+            print(sequence_name + "已删除name为" + name + "的信息")
         except:
-            print("Error in \"" + sql + "\"")
+            print(name + "存在外键约束,无法删除,建议自己添加一个属性再删除")
             db.rollback()
     
-    def SelectName(db, cursor, sequence_name):
-        sql = "select name from "+ sequence_name +" where road = "
-        road = input("途径序号：")
-        sql = sql + "\'" + road + "\';"
-        print(sql)
-        try:
-            cursor.execute(sql)
-            print(sequence_name + "中途径序号为" + road + "的名称:")
-            data = cursor.fetchall()
-            for item in data:
-                print(item["name"])
-        except:
-            print("Error in \"" + sql + "\"")
-            pass
+    def Display(db, cursor, sequence_name):
+        sql = "select * from "+ sequence_name
+        cursor.execute(sql)
+        data = cursor.fetchall()
+        for item1 in data:
+            for item2 in item1:
+                if len(item1[item2]) >= 4:
+                    print(item1[item2],end="\t")
+                else:
+                    print(item1[item2],end="\t\t")
+            print()
+        print()
 
 # 神（天使，圣者）
 # 源质
 class godorsource:
     def Init(db, cursor, godorsource_name):
+        cursor.execute(" set foreign_key_checks = 0")
         cursor.execute("drop table if exists " + godorsource_name)
         sql = """create table """+ godorsource_name +""" (
-                name varchar(30),
+                name varchar(30) not null,
                 PRIMARY KEY (name))"""
         cursor.execute(sql)
+        cursor.execute(" set foreign_key_checks = 1")
         db.commit()
         return godorsource_name
 
     def Insert(db, cursor, godorsource_name):
         sql = "insert into "+ godorsource_name +"(name) "
         name = input("name:")
+        if name == "":
+            print("输入为空")
+            return
+        sql2 = "select count(*) from "+godorsource_name+" where name = \'" + name + "\'"
+        cursor.execute(sql2)
+        flag = cursor.fetchall()
+        if flag[0]["count(*)"] > 0:
+            print(name + "重复")
+            return
         sql = sql + "value(\'" + name + "\');"
         print(sql)
         try:
@@ -111,8 +150,17 @@ class godorsource:
             db.rollback()
 
     def Delete(db, cursor, godorsource_name):
-        sql = "DELETE FROM "+ godorsource_name +" WHERE name = "
+        sql = "delete from "+ godorsource_name +" where name = "
         name = input("要删除的name：")
+        if name == "":
+            print("输入为空")
+            return
+        sql2 = "select count(*) from "+godorsource_name+" where name = \'" + name + "\'"
+        cursor.execute(sql2)
+        flag = cursor.fetchall()
+        if flag[0]["count(*)"] == 0:
+            print(name + "不存在")
+            return
         sql = sql + "\'" + name + "\';"
         print(sql)
         try:
@@ -123,28 +171,30 @@ class godorsource:
             print("Error in \"" + sql + "\"")
             db.rollback()
     
-    def Select(db, cursor, godorsource_name):
-        sql = "select name from "+ godorsource_name
-        print(sql)
-        try:
-            cursor.execute(sql)
-            print(godorsource_name + "中的name:")
-            data = cursor.fetchall()
-            for item in data:
-                print(item["name"])
-        except:
-            print("Error in \"" + sql + "\"")
-            pass
+    def Display(db, cursor, godorsource_name):
+        sql = "select * from "+ godorsource_name
+        cursor.execute(sql)
+        data = cursor.fetchall()
+        for item1 in data:
+            for item2 in item1:
+                if len(item1[item2]) >= 4:
+                    print(item1[item2],end="\t")
+                else:
+                    print(item1[item2],end="\t\t")
+            print()
+        print()
 
 # 塔罗会
 class tarot_club:
     def Init(db, cursor, tarot_club_name):
+        cursor.execute(" set foreign_key_checks = 0")
         cursor.execute("drop table if exists " + tarot_club_name)
         sql = """create table """+ tarot_club_name +""" (
-                codename varchar(30),
-                name varchar(30),
+                codename varchar(30) not null,
+                name varchar(30) not null,
                 PRIMARY KEY (codename))"""
         cursor.execute(sql)
+        cursor.execute(" set foreign_key_checks = 1")
         db.commit()
         return tarot_club_name
 
@@ -152,6 +202,16 @@ class tarot_club:
         sql = "insert into "+ tarot_club_name +"(codename, name) "
         codename = input("codename:")
         name = input("name:")
+        if codename == "" or name == "":
+            print("输入为空")
+            return
+        sql2 = "select count(*) from "+tarot_club_name+" where codename=\'" + codename + "\'"
+        cursor.execute(sql2)
+        flag = cursor.fetchall()
+        if flag[0]["count(*)"] > 0:
+            print(codename + "重复")
+            return
+        
         sql = sql + "value(\'" + codename + "\', \'" + name + "\');"
         print(sql)
         try:
@@ -172,10 +232,19 @@ class tarot_club:
 
     def Update(db, cursor, tarot_club_name):
         codename = input("需更改信息的codename：")
-        sql = "UPDATE "+ tarot_club_name +" "
+        sql = "update "+ tarot_club_name +" "
         name = input("请输入新的name：")
+        if codename == "":
+            print("输入为空")
+            return
+        sql2 = "select count(*) from "+tarot_club+" where codename = \'" + codename + "\'"
+        cursor.execute(sql2)
+        flag = cursor.fetchall()
+        if flag[0]["count(*)"] == 0:
+            print(codename + "不存在")
+            return
         sql = sql + "set name = \'" + name + "\' "
-        sql = sql + "WHERE codename = \'" + codename + "\';"
+        sql = sql + "where codename = \'" + codename + "\';"
         print(sql)
         try:
             cursor.execute(sql)
@@ -186,8 +255,17 @@ class tarot_club:
             db.rollback()
 
     def Delete(db, cursor, tarot_club_name):
-        sql = "DELETE FROM "+ tarot_club_name +" WHERE codename = "
+        sql = "delete from "+ tarot_club_name +" where codename = "
         codename = input("要删除的codename：")
+        if codename == "":
+            print("输入为空")
+            return
+        sql2 = "select count(*) from "+tarot_club+" where codename = \'" + codename + "\'"
+        cursor.execute(sql2)
+        flag = cursor.fetchall()
+        if flag[0]["count(*)"] == 0:
+            print(codename + "不存在")
+            return
         sql = sql + "\'" + codename + "\';"
         print(sql)
         try:
@@ -198,17 +276,15 @@ class tarot_club:
             print("Error in \"" + sql + "\"")
             db.rollback()
     
-    def SelectName(db, cursor, tarot_club_name):
-        sql = "select name from "+ tarot_club_name +" where codename = "
-        codename = input("途径序号：")
-        sql = sql + "\'" + codename + "\';"
-        print(sql)
-        try:
-            cursor.execute(sql)
-            print(tarot_club_name + "中途径序号为" + codename + "的名称:")
-            data = cursor.fetchall()
-            for item in data:
-                print(item["name"])
-        except:
-            print("Error in \"" + sql + "\"")
-            pass
+    def Display(db, cursor, tarot_club_name):
+        sql = "select * from "+ tarot_club_name
+        cursor.execute(sql)
+        data = cursor.fetchall()
+        for item1 in data:
+            for item2 in item1:
+                if len(item1[item2]) >= 4:
+                    print(item1[item2],end="\t")
+                else:
+                    print(item1[item2],end="\t\t")
+            print()
+        print()
