@@ -1,5 +1,8 @@
 import pymysql
 
+# 两种关系，
+# 文件读取（使用InsertSlient）时就已经建立好了，
+# 用户不能修改，包含事务管理
 # 序列与神、源质的属于关系
 class belongGStoSeq:
     def Init(db, cursor, belong_name, name1, name2):

@@ -1,5 +1,7 @@
 import pymysql
 
+# 三种实体
+# 它们的插入更新删除都包含事务管理
 # 序列
 class sequence:
     def Init(db, cursor, sequence_name):
@@ -8,7 +10,8 @@ class sequence:
         sql = """create table """+ sequence_name +""" (
                 road varchar(2) not null,
                 name varchar(30) not null,
-                primary key (name))"""
+                primary key (name),
+                index index_road (road))"""
         cursor.execute(sql)
         cursor.execute("set foreign_key_checks = 1")
         db.commit()

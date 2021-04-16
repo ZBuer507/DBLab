@@ -5,17 +5,23 @@ sys.path.append("D:\计算机\WORKS\DB")
 from Lab2.entity import *
 from Lab2.relationship import *
 
+# 用来存储类型为sequence的表的名字
 global sequenceName
 sequenceName = []
+# 用来存储类型为tarot_club的表的名字
 global tarrotClubName
 tarotClub = []
+# 用来存储类型为godorsource的表的名字
 global sourceName
 sourceName = []
+# 用来存储属于关系(belongGStoSeq, belongSeqtoT)的表的名字
 global relaBelongName
 relaBelongName = []
+# 用来存储转换关系(transformStoS)的表的名字
 global relaTranformName
 relaTranformName = []
 
+# 连接查询，分组查询
 def groupTarotBySequence(db, cursor):
     data = []
     for item1 in tarotClub:
@@ -39,6 +45,7 @@ def groupTarotBySequence(db, cursor):
         print()
     print()
 
+# 分组查询
 def searchTarotAndSequence(db, cursor):
     data = []
     for item1 in tarotClub:
@@ -61,6 +68,7 @@ def searchTarotAndSequence(db, cursor):
         print()
     print()
 
+# 查询
 def searchSourceAndSequence(db, cursor):
     data = []
     for item1 in sequenceName:
@@ -82,20 +90,14 @@ def searchSourceAndSequence(db, cursor):
         print()
     print()
 
+# 从视图中查询
 def searchGodInTarot(db, cursor):
     data = []
     for item1 in sequenceName:
         for item2 in tarotClub:
             for item3 in relaBelongName:
                 if item3[1] == "2":
-                    sql = """select """+item1+""".road, """+item1+""".name, """ + item2 + """.codename, """ + item2 + """.name
-                            from """+item1+""", """ + item2 + """, """ + item3[0] + """
-                            where """+item1+""".name = """ + item3[0] + """.name 
-                                and """+item2+""".codename = """ + item3[0] + """.codename
-                                and """+item1+""".road in (
-                                    select road
-                                    from """ + item1 + """
-                                    where """ + item1 + """.road < 5)"""
+                    sql = """select * from """+item1+item2+item3[0]
                     cursor.execute(sql)
                     print(sql)
                     data += cursor.fetchall()
@@ -109,6 +111,54 @@ def searchGodInTarot(db, cursor):
         print()
     print()
 
+# 建立视图
+def viewGodInTarot(db, cursor):
+    for item1 in sequenceName:
+        for item2 in tarotClub:
+            for item3 in relaBelongName:
+                if item3[1] == "2":
+                    cursor.execute("drop view if exists "+item1+item2+item3[0])
+                    sql = """create view """+item1+item2+item3[0]+"""(road, roadname, codename, name)
+                            as select """+item1+""".road, """+item1+""".name, """ + item2 + """.codename, """ + item2 + """.name
+                            from """+item1+""", """ + item2 + """, """ + item3[0] + """
+                            where """+item1+""".name = """ + item3[0] + """.name 
+                                and """+item2+""".codename = """ + item3[0] + """.codename
+                                and """+item1+""".road in (
+                                    select road
+                                    from """ + item1 + """
+                                    where """ + item1 + """.road < 5)"""
+                    cursor.execute(sql)
+                    print(sql)
+
+# 分组查询包含having语句
+def searchGodInTaroGroupAndHaving(db, cursor):
+    data = []
+    for item1 in sequenceName:
+        for item2 in tarotClub:
+            for item3 in relaBelongName:
+                if item3[1] == "2":
+                    sql = """select """+item1+""".road, """+item1+""".name, """ + item2 + """.codename, """ + item2 + """.name
+                            from """+item1+""", """ + item2 + """, """ + item3[0] + """
+                            where """+item1+""".name = """ + item3[0] + """.name and """+item2+""".codename = """ + item3[0] + """.codename
+                            group by """ + item2 + """.codename
+                            having """+item1+""".road < 5"""
+                    cursor.execute(sql)
+                    print(sql)
+                    data += cursor.fetchall()
+    print("序列\t\t序列名\t\t代号\t\t姓名")
+    for item1 in data:
+        for item2 in item1:
+            if len(item1[item2]) >= 4:
+                print(item1[item2],end="\t")
+            else:
+                print(item1[item2],end="\t\t")
+        print()
+    print()
+
+# 下面的几个establish函数都使用了自动机的思想，
+# 从文件中读取数据，
+# 根据输入切换state，
+# 达成建立表和关系的目的
 def establishRelationship(db, cursor):
     with open('Lab2/belongAndTransform.txt', "r", encoding=("utf8")) as f:
         lines = []
@@ -285,7 +335,7 @@ def menu():
             else:
                 print("不存在此选项")
         elif flag == "2":
-            print("1.查询塔罗会各序列成员（分组查询）\n2.查询塔罗会成员序列名称（连接查询）\n3.查询各序列所属源质\n4.查询塔罗会中的神和半神（嵌套查询）\n5.取消\n")
+            print("1.查询塔罗会各序列成员（分组查询）\n2.查询塔罗会成员序列名称（连接查询）\n3.查询各序列所属源质\n4.查询塔罗会中的神和半神（嵌套查询）\n5.查询塔罗会中的神和半神（group and having）\n6.取消\n")
             choice = input("请输入:")
             if choice == "1":
                 groupTarotBySequence(db, cursor)
@@ -296,6 +346,8 @@ def menu():
             elif choice == "4":
                 searchGodInTarot(db, cursor)
             elif choice == "5":
+                searchGodInTaroGroupAndHaving(db, cursor)
+            elif choice == "6":
                 pass
             else:
                 print("不存在此选项")
@@ -322,6 +374,7 @@ def menu():
             print("不存在此选项,请重新输入")
 
 if __name__ == "__main__":
+    # 默认数据库已经存在
     db = pymysql.connect(host='localhost',
                         user='root',
                         password='507520',
@@ -329,10 +382,14 @@ if __name__ == "__main__":
                         database="LordofMysteries",
                         cursorclass=pymysql.cursors.DictCursor)
     cursor = db.cursor()
-
+    # 从文件中读取并建立数据库
+    # 每次都是重新开始
     establishSource(db, cursor)
     establishSequence(db, cursor)
     establishTarotClub(db, cursor)
     establishRelationship(db, cursor)
+    # 建立试图，sql语句会打印出来
+    viewGodInTarot(db, cursor)
+    # 菜单，进入循环
     menu()
     db.close()
