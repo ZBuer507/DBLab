@@ -1,0 +1,18 @@
+﻿  experiment.c
+D:\计算机\WORKS\CPP\DBLAB3\experiment.c(60,52): warning C4047: “=”:“unsigned char”与“void *”的间接级别不同
+D:\计算机\WORKS\CPP\DBLAB3\experiment.c(123,52): warning C4047: “=”:“unsigned char”与“void *”的间接级别不同
+D:\计算机\WORKS\CPP\DBLAB3\experiment.c(333,12): warning C4101: “j”: 未引用的局部变量
+D:\计算机\WORKS\CPP\DBLAB3\experiment.c(440,12): warning C4101: “j”: 未引用的局部变量
+D:\计算机\WORKS\CPP\DBLAB3\experiment.c(440,9): warning C4101: “i”: 未引用的局部变量
+D:\计算机\WORKS\CPP\DBLAB3\experiment.c(536,29): warning C4047: “=”:“unsigned char”与“void *”的间接级别不同
+D:\计算机\WORKS\CPP\DBLAB3\experiment.c(566,53): warning C4047: “=”:“unsigned char”与“void *”的间接级别不同
+D:\计算机\WORKS\CPP\DBLAB3\experiment.c(587,37): warning C4047: “=”:“unsigned char”与“void *”的间接级别不同
+D:\计算机\WORKS\CPP\DBLAB3\experiment.c(610,58): warning C4047: “!=”:“int”与“void *”的间接级别不同
+D:\计算机\WORKS\CPP\DBLAB3\experiment.c(678,10): warning C4101: “strAddr”: 未引用的局部变量
+  extmem.c
+D:\计算机\WORKS\CPP\DBLAB3\extmem.c(29,11): warning C4013: “memset”未定义；假设外部返回 int
+D:\计算机\WORKS\CPP\DBLAB3\extmem.c(14,9): warning C4101: “i”: 未引用的局部变量
+  main.c
+  test.c
+  正在生成代码...
+  DBLAB3.vcxproj -> D:\计算机\WORKS\CPP\DBLAB3\Debug\DBLAB3.exe
